@@ -59,11 +59,13 @@ class DebugToolbarMiddleware(object):
         return None
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        if self.debug_toolbar:
+        if self.show_toolbar(request) and self.debug_toolbar:
             for panel in self.debug_toolbar.panels:
                 panel.process_view(request, view_func, view_args, view_kwargs)
 
     def process_response(self, request, response):
+        if not self.show_toolbar(request):
+            return response
         if not self.debug_toolbar:
             return response
         if self.debug_toolbar.config['INTERCEPT_REDIRECTS']:
